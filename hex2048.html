@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>The Scala.js Tutorial</title>
+
+    <style>
+    .tile {
+      fill: #ccc1b4;
+      stroke: #bbad9f;
+      stroke-width: 3;
+    }
+    .tile-2 {
+      fill: #eee4da;
+    }
+    .tile-4 {
+      fill: #eee1c9;
+    }
+    .tile-8 {
+      fill: #f3b27a;
+    }
+    .tile-16 {
+      fill: #f69664;
+    }
+    .tile-32 {
+      fill: #f77c5f;
+    }
+    .tile-64 {
+      fill: #f75f3b;
+    }
+    .tile-128 {
+      fill: #edd073;
+    }
+    .tile-256 {
+      fill: #edcc62;
+    }
+    .tile-512 {
+      fill: #edc950;
+    }
+    .tile-1024 {
+      fill: #edc950;
+    }
+    .tile-2048 {
+      fill: #edc950;
+    }
+
+    </style>
+
+</head>
+<body>
+
+<div id="game-container"></div>
+
+
+<!-- Include Scala.js compiled code -->
+<script type="text/javascript" src="./target/scala-2.13/hex2048-fastopt/main.js"></script>
+<!--
+<script>
+  let svg2 = document.createElementNS('http://www.w3.org/2000/svg', "svg")
+    // svg.setAttribute("viewBox", s"0 0 ${2 * r} ${2 * r * sin(Pi / 3)}")
+    svg2.setAttribute("height", "300")
+    svg2.setAttribute("width", "300")
+
+    let polygon2 = document.createElementNS('http://www.w3.org/2000/svg', "polygon")
+    polygon2.setAttribute("points", "0,0 50,0 50,50 0,50")
+    polygon2.setAttribute("style", "fill:lime;stroke:purple;stroke-width:1")
+
+    svg2.appendChild(polygon2)
+
+    document.body.appendChild(svg2)
+
+</script>
+-->
+</body>
+</html>

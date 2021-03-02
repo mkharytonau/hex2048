@@ -1,0 +1,10 @@
+target/
+
+.idea
+*.iml
+*.sc
+.bloop
+.history
+.metals
+metals.sbt
+.bsp
