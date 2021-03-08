@@ -7,6 +7,11 @@ ThisBuild / version          := "0.1.0-SNAPSHOT"
 ThisBuild / organization     := "com.example"
 ThisBuild / organizationName := "example"
 
+ThisBuild /  semanticdbEnabled := true
+ThisBuild /  semanticdbVersion := scalafixSemanticdb.revision
+
+ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
+
 val circeVersion = "0.13.0"
 
 lazy val root = (project in file("."))
@@ -19,8 +24,15 @@ lazy val root = (project in file("."))
       "io.circe" %%% "circe-generic" % circeVersion,
       "io.circe" %%% "circe-parser" % circeVersion,
 
+      "org.typelevel" %%% "cats-effect" % "2.3.3",
+
+      "com.lihaoyi" %%% "scalatags" % "0.9.3",
+
     	"org.scalatest" %%% "scalatest" % "3.2.2" % Test,
     	"org.scalatestplus" %%% "scalacheck-1-15" % "3.2.2.0" % Test,
+    ),
+    scalacOptions ++= Seq(
+      "-Wunused:imports",
     )
   )
 

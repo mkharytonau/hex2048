@@ -5,6 +5,15 @@
     <title>The Scala.js Tutorial</title>
 
     <style>
+    header {
+        text-align: center;
+    }
+
+    #game-container {
+        text-align: center;
+        padding-top: 10px;
+    }
+
     .tile {
       fill: #ccc1b4;
       stroke: #bbad9f;
@@ -44,12 +53,20 @@
       fill: #edc950;
     }
 
+
     </style>
 
 </head>
 <body>
+    <header>
+        <h4>Welcome to Hex2048!</h4>
+        <label for="gameRadius">Game radius:</label>
+        <input type="number" id="gameRadius" min="2" max="20" value="5"/>
+        <button id="playButton">Play!</button>
+    </header>
 
-<div id="game-container"></div>
+
+    <div id="game-container"></div>
 
 
 <!-- Include Scala.js compiled code -->

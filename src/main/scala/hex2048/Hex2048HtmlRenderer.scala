@@ -1,15 +1,22 @@
 package hex2048
 
+import cats.Applicative
 import hex2048.Hex2048State.Cell
-import hex2048.Hex2048State.Tile.{Empty, HasValue}
+import hex2048.Hex2048State.Cell.CubeCoordinate
+import hex2048.Hex2048State.Tile.Empty
+import hex2048.Hex2048State.Tile.HasValue
 import org.scalajs.dom.document
 
 import scala.math._
 
-class Hex2048HtmlRenderer(htmlContainerId: String, gameXc: Int, gameYc: Int, radius: Int) {
+class Hex2048HtmlRenderer[F[_]: Applicative](htmlContainerId: String, gameXc: Double, gameYc: Double, radius: Int) {
+  import Hex2048HtmlRenderer.Constants
 
   def polygonPoints(r: Double): String = {
-    (0 to 300 by 60).map(_ * scala.math.Pi / 180).map(rad => s"${r + r * cos(rad)},${r * sin(Pi / 3) - r * sin(rad)}").mkString(" ")
+    (0 to 300 by 60)
+      .map(_ * scala.math.Pi / 180)
+      .map(rad => s"${r + r * cos(rad)},${r * Constants.sin60 - r * sin(rad)}")
+      .mkString(" ")
   }
 
   def cubeToOddq(cube: (Int, Int, Int)): (Int, Int) = {
@@ -24,15 +31,23 @@ class Hex2048HtmlRenderer(htmlContainerId: String, gameXc: Int, gameYc: Int, rad
     }
   }
 
-  def draw(state: Array[Hex2048State.Cell]): Unit = {
+  def drawGame(state: Hex2048State): F[Unit] = implicitly[Applicative[F]] pure {
     val gameContainer = document.getElementById(htmlContainerId)
 
-    while(gameContainer.hasChildNodes()) {
+    while (gameContainer.hasChildNodes()) {
       val child = gameContainer.firstChild
       gameContainer.removeChild(child)
     }
 
-    val elements = (state.map { case Cell(x, y, z, tile) =>
+    val gameStatus = document.createElement("div")
+    gameStatus.textContent = "Game Status: "
+    val gameStatusSpan = document.createElement("span")
+    gameStatusSpan.setAttribute("data-status", state.gameStatus.toString)
+    gameStatusSpan.textContent = state.gameStatus.toString
+    gameStatus.appendChild(gameStatusSpan)
+    gameContainer.appendChild(gameStatus)
+
+    val elements = (state.state.map { case Cell(CubeCoordinate(x, y, z), tile) =>
       val oddq = cubeToOddq((x, y, z))
       val (xc, yc) = oddqToAbsolute(gameXc, gameYc, radius, oddq)
       val polygonPts = polygonPoints(radius)
@@ -41,11 +56,14 @@ class Hex2048HtmlRenderer(htmlContainerId: String, gameXc: Int, gameYc: Int, rad
       div.setAttribute("data-x", x.toString)
       div.setAttribute("data-y", y.toString)
       div.setAttribute("data-z", z.toString)
-      div.setAttribute("data-value", {
-        tile match {
-          case Empty => "0"
-          case withValue: HasValue => withValue.value.toString
-        }})
+      div.setAttribute(
+        "data-value", {
+          tile match {
+            case Empty => "0"
+            case withValue: HasValue => withValue.value.toString
+          }
+        },
+      )
       div.setAttribute("style", s"position: absolute; left: ${xc - radius}px; top: ${yc - radius * sin(Pi / 3)}px")
 
       val svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
@@ -68,7 +86,8 @@ class Hex2048HtmlRenderer(htmlContainerId: String, gameXc: Int, gameYc: Int, rad
         tile match {
           case Empty => ""
           case withValue: HasValue => withValue.value.toString
-        }}
+        }
+      }
 
       svg.appendChild(polygon)
       svg.appendChild(text)
@@ -80,4 +99,20 @@ class Hex2048HtmlRenderer(htmlContainerId: String, gameXc: Int, gameYc: Int, rad
     elements foreach gameContainer.appendChild
   }
 
+  def drawInitialPage(): Unit = {
+//    val inputLabel = document.createElement("label")
+//    inputLabel.setAttribute("for", "gameRadius")
+//    inputLabel.textContent = "Game radius:"
+//
+//    val gameRadiusInput = document.createElement("")
+
+  }
+
+}
+
+object Hex2048HtmlRenderer {
+  object Constants {
+    import scala.math._
+    val sin60: Double = sin(Pi / 3)
+  }
 }
