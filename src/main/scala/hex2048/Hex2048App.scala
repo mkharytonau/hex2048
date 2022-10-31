@@ -56,14 +56,14 @@ object Hex2048App extends IOApp {
             radius = radius,
           ),
           rngService = new DataFromServer[IO](
-            serverHost = "127.0.0.1",
+            serverHost = "localhost",
             serverPort = 13337,
           ),
           htmlRenderer = new Hex2048HtmlRenderer(
             htmlContainerId = "game-container",
             gameXc = window.innerWidth / 2,
             gameYc = window.innerHeight / 2,
-            radius = (window.innerHeight * 0.75 / ((2 * radius - 1) * 2) / Hex2048HtmlRenderer.Constants.sin60).toInt,
+            cellRadiusPx = (window.innerHeight * 0.75 / ((2 * radius - 1) * 2) / Hex2048HtmlRenderer.Constants.sin60).toInt,
           ),
         )
         .value

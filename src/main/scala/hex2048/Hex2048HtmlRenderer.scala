@@ -9,23 +9,23 @@ import org.scalajs.dom.document
 
 import scala.math._
 
-class Hex2048HtmlRenderer[F[_]: Applicative](htmlContainerId: String, gameXc: Double, gameYc: Double, radius: Int) {
+class Hex2048HtmlRenderer[F[_]: Applicative](htmlContainerId: String, gameXc: Double, gameYc: Double, cellRadiusPx: Int) {
   import Hex2048HtmlRenderer.Constants
 
-  def polygonPoints(r: Double): String = {
-    (0 to 300 by 60)
-      .map(_ * scala.math.Pi / 180)
-      .map(rad => s"${r + r * cos(rad)},${r * Constants.sin60 - r * sin(rad)}")
-      .mkString(" ")
-  }
+  private val polygonPoints: String = (0 to 300 by 60)
+    .map(_ * scala.math.Pi / 180)
+    .map(rad =>
+      s"${cellRadiusPx + cellRadiusPx * cos(rad)},${cellRadiusPx * Constants.sin60 - cellRadiusPx * sin(rad)}",
+    )
+    .mkString(" ")
 
-  def cubeToOddq(cube: (Int, Int, Int)): (Int, Int) = {
+  private def cubeToOddq(cube: (Int, Int, Int)): (Int, Int) = {
     cube match {
       case (x, y, z) => (x, z + (x - (x & 1)) / 2)
     }
   }
 
-  def oddqToAbsolute(xc: Double, yc: Double, r: Double, oddq: (Int, Int)): (Double, Double) = {
+  private def oddqToAbsolute(xc: Double, yc: Double, r: Double, oddq: (Int, Int)): (Double, Double) = {
     oddq match {
       case (x, y) => (xc + x * r * 1.5, yc + r * sin(Pi / 3) * (2 * y + (x & 1)))
     }
@@ -49,8 +49,8 @@ class Hex2048HtmlRenderer[F[_]: Applicative](htmlContainerId: String, gameXc: Do
 
     val elements = (state.state.map { case Cell(CubeCoordinate(x, y, z), tile) =>
       val oddq = cubeToOddq((x, y, z))
-      val (xc, yc) = oddqToAbsolute(gameXc, gameYc, radius, oddq)
-      val polygonPts = polygonPoints(radius)
+      val (xc, yc) = oddqToAbsolute(gameXc, gameYc, cellRadiusPx, oddq)
+      val polygonPts = polygonPoints(cellRadiusPx)
 
       val div = document.createElement("div")
       div.setAttribute("data-x", x.toString)
@@ -64,18 +64,18 @@ class Hex2048HtmlRenderer[F[_]: Applicative](htmlContainerId: String, gameXc: Do
           }
         },
       )
-      div.setAttribute("style", s"position: absolute; left: ${xc - radius}px; top: ${yc - radius * sin(Pi / 3)}px")
+      div.setAttribute("style", s"position: absolute; left: ${xc - cellRadiusPx}px; top: ${yc - cellRadiusPx * sin(Pi / 3)}px")
 
       val svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-      svg.setAttribute("height", (2 * radius * sin(Pi / 3)).toString)
-      svg.setAttribute("width", (2 * radius).toString)
+      svg.setAttribute("height", (2 * cellRadiusPx * sin(Pi / 3)).toString)
+      svg.setAttribute("width", (2 * cellRadiusPx).toString)
 
       val tileValue = tile match {
         case Empty => ""
         case withValue: HasValue => withValue.value.toString
       }
       val polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon")
-      polygon.setAttribute("points", polygonPts)
+      polygon.setAttribute("points", polygonPoints)
       polygon.setAttribute("class", s"""tile ${if (tileValue.nonEmpty) s"tile-$tileValue" else ""}""")
       val text = document.createElementNS("http://www.w3.org/2000/svg", "text")
       text.setAttribute("x", "50%")
@@ -97,15 +97,6 @@ class Hex2048HtmlRenderer[F[_]: Applicative](htmlContainerId: String, gameXc: Do
     })
 
     elements foreach gameContainer.appendChild
-  }
-
-  def drawInitialPage(): Unit = {
-//    val inputLabel = document.createElement("label")
-//    inputLabel.setAttribute("for", "gameRadius")
-//    inputLabel.textContent = "Game radius:"
-//
-//    val gameRadiusInput = document.createElement("")
-
   }
 
 }
